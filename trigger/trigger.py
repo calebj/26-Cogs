@@ -390,7 +390,7 @@ class Trigger:
     def delete_trigger(self, name, ctx):
         trigger = self.get_trigger_by_name(name)
         if trigger:
-            if not trigger.can_edit(ctx.message.author):
+            if not trigger.can_edit(ctx):
                 raise Unauthorized()
             self.triggers.remove(trigger)
             self.save_triggers()
@@ -477,7 +477,11 @@ class Trigger:
         if author == self.bot.user:
             return
 
-        if not self.bot.user_allowed(message):
+        try:
+            allowed = self.bot.user_allowed(message, allow_others=True):
+        except TypeError:
+            allowed = self.bot.user_allowed(message):
+        if not allowed:
             return
 
         if self.is_command(message):
